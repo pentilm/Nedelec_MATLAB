@@ -1,0 +1,207 @@
+\documentclass[12pt,reqno]{amsart}
+\textwidth=6.5in
+\textheight=9in
+\oddsidemargin=0in
+\evensidemargin=0in
+\topmargin=-0.4in
+\parindent=24pt
+\parskip=5pt
+\usepackage{amsmath,amssymb,bm}
+\usepackage{gensymb}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage{mathrsfs}
+\setlength{\parindent}{2em}
+\numberwithin{equation}{section}
+\renewcommand*\figurename{Figure}
+\newcommand{\dfi}[2]{\ensuremath{\dfrac{\partial #1}{\partial #2}}}
+\newcommand{\dfii}[2]{\ensuremath{\dfrac{\partial^2 #1}{\partial #2^2}}}
+\newcommand{\dd}{\ensuremath{\mathrm{d}}}
+\newcommand{\sign}{\ensuremath{\mathrm{sign}}}
+\newcommand{\ve}{\ensuremath{\varepsilon}}
+\newcommand{\reff}[1]{(\ref{#1})}
+\newcommand{\reffig}[1]{Figure \ref{#1}}
+\def\E{\ensuremath{\mathbf{E}}}
+\def\J{\ensuremath{\mathbf{J}}}
+\def\bphi{\ensuremath{\bm{\phi}}}
+\def\go{\ensuremath{\mathbf{g_1}}}
+\def\gt{\ensuremath{\mathbf{g_3}}}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
+\newtheorem{corollary}{Corollary}
+\begin{document}
+\section{General}
+Weak form
+\begin{align}
+(\E_t,\bphi)-(H,\nabla\times\bphi)+(\J,\bphi)	&=(\go,\bphi)\\
+(H_t,\psi)+(\nabla\times \E,\psi)+(K,\psi)	&=(g_2,\psi)\\
+(\J_t,\bphi)+\Gamma_e(\J,\bphi)-\omega_e^2(\E,\bphi)	&=(\gt,\bphi)\\
+(K_t,\psi)+\Gamma_m(K,\psi)-\omega_m^2(H,\psi)	&=(g_4,\psi)
+\end{align}
+Numerical scheme
+
+For $ \J $ and $ K $:
+\begin{align*}
+\J^k+\J^{k-1}	&=\frac{4}{2+\tau \Gamma_e}\J^{k-1}+\frac{\tau\omega_e^2}{2+\tau\Gamma_e}(\E^k+\E^{k-1})+\frac{2\tau}{2+\tau\Gamma_e}\gt^{k-1/2}\\
+K^k+K^{k-1}	&=\frac{4}{2+\tau\Gamma_m}K^{k-1}+\frac{\tau\omega_m^2}{2+\tau\Gamma_m}(H^k+H^{k-1})+\frac{2\tau}{2+\tau\Gamma_m}g_4^{k-1/2}
+\end{align*}
+Computational scheme:
+\begin{align}
+\left(1+\frac{\tau^2\omega_e^2}{4+2\tau\Gamma_e}\right)(\E^k,\bphi)-\frac{\tau}{2}(H^k,\nabla\times\bphi)	&=\left(1-\frac{\tau^2\omega_e^2}{4+2\tau\Gamma_e}\right)(\E^{k-1},\bphi)+\frac{\tau}{2}(H^{k-1},\nabla\times\bphi)\nonumber\\
+&-\frac{2\tau}{2+\tau\Gamma_e}(\J^{k-1},\bphi)-\frac{\tau^2}{2+\tau\Gamma_e}(\gt^{k-1/2},\bphi)+\tau(\go^{k-1/2},\bphi)\\
+\left(1+\frac{\tau^2\omega_m^2}{4+2\tau\Gamma_m}\right)(H^k,\psi)+\frac{\tau}{2}(\nabla\times\E^k,\psi)	&=\left(1-\frac{\tau^2\omega_m^2}{4+2\tau\Gamma_m}\right)(H^{k-1},\psi)-\frac{\tau}{2}(\nabla\times\E^{k-1},\psi)\nonumber\\
+&-\frac{2\tau}{2+\tau\Gamma_m}(K^{k-1},\psi)-\frac{\tau^2}{2+\tau\Gamma_m}(g_4,\psi)+\tau(g_2^{k-1/2},\psi)\\
+\J^k	&=\frac{2-\tau\Gamma_e}{2+\tau\Gamma_e}\J^{k-1}+\frac{\tau\omega_e^2}{2+\tau\Gamma_e}(\E^k+\E^{k-1})+\frac{2\tau}{2+\tau\Gamma_e}\gt^{k-1/2}\\
+K^k	&=\frac{2-\tau\Gamma_m}{2+\tau\Gamma_m}K^{k-1}+\frac{\tau\omega_m^2}{2+\tau\Gamma_m}(H^k+H^{k-1})+\frac{2\tau}{2+\tau\Gamma_m}g_4^{k-1/2}
+\end{align}
+\section{Triangle Element}
+For a triangle $ K $ with vertices $ (x_i,y_i) $, $ i=1,2,3 $ which are ordered conterclockwisely, let $ \phi_{ij} $ be linear edge element basis function formed by vertices $ (x_i,y_i) $ and $ (x_j,y_j) $, then
+\[
+\phi_{ij}=\lambda_i\nabla\lambda_j-\lambda_j\nabla\lambda_i
+\]
+particularly,
+\[
+\phi_{i,i+1}=
+\frac{1}{2|K|}\begin{pmatrix}
+y_{i+2}-y\\
+x-x_{i+2}
+\end{pmatrix},\qquad i=\mod(i-1,3)+1
+\]
+where 
+\[
+|K|=\frac{1}{2}
+\begin{vmatrix}
+1	&	x_1	&	y_1\\
+1	&	x_2	&	y_2\\
+1	&	x_3	&	y_3
+\end{vmatrix}
+\]
+and basis functions in barycentric coordinate:
+\[
+\lambda_1(x,y)=\frac{1}{2|K|}
+\begin{vmatrix}
+1	&	x	&	y\\
+1	&	x_2	&	y_2\\
+1	&	x_3	&	y_3
+\end{vmatrix}\qquad
+\lambda_2(x,y)=\frac{1}{2|K|}
+\begin{vmatrix}
+1	&	x_1	&	y_1\\
+1	&	x	&	y\\
+1	&	x_3	&	y_3
+\end{vmatrix}\qquad
+\lambda_3(x,y)=\frac{1}{2|K|}
+\begin{vmatrix}
+1	&	x_1	&	y_1\\
+1	&	x_2	&	y_2\\
+1	&	x	&	y
+\end{vmatrix}
+\]
+Their gradients:
+\[
+\nabla\lambda_1(x,y)=\frac{1}{2|K|}
+\begin{pmatrix}
+y_2-y_3\\
+x_3-x_2
+\end{pmatrix}\quad
+\nabla\lambda_2(x,y)=\frac{1}{2|K|}
+\begin{pmatrix}
+y_3-y_1\\
+x_1-x_3
+\end{pmatrix}\quad
+\nabla\lambda_3(x,y)=\frac{1}{2|K|}
+\begin{pmatrix}
+y_1-y_2\\
+x_2-x_1
+\end{pmatrix}
+\]
+Let $ \nabla\lambda_i=\frac{v_i}{2|K|} $.
+
+For mass matrix:
+
+Diagonal entries:
+{\small \begin{align*}
+\int_{\triangle}\phi_{12}^2	&=\int_{\triangle} (\lambda_1\nabla\lambda_2-\lambda_2\nabla\lambda_1)^2
+	=\int_{\triangle}\lambda_1^2|\nabla\lambda_2|^2-2\lambda_1\lambda_2\left(\nabla\lambda_1\cdot\nabla\lambda_2\right)+\lambda_2^2|\nabla\lambda_1|^2\\
+	&=\frac{|K|}{6}\left(|\nabla\lambda_2|^2-\nabla\lambda_1\cdot\nabla\lambda_2+|\nabla\lambda_1|^2\right)=\frac{1}{24|K|}(v_2^2-v_1\cdot v_2+v_1^2)\\
+	&=\frac{1}{24|K|}[(y_3-y_1)^2-(y_3-y_1)(y_2-y_3)+(y_2-y_3)^2+(x_1-x_3)^2-(x_1-x_3)(x_3-x_2)+(x_3-x_2)^2]
+\end{align*}}
+{\small \begin{align*}
+	\int_{\triangle}\phi_{23}^2	&=\int_{\triangle} (\lambda_2\nabla\lambda_3-\lambda_3\nabla\lambda_2)^2
+	=\int_{\triangle}\lambda_2^2|\nabla\lambda_3|^2-2\lambda_2\lambda_3\left(\nabla\lambda_2\cdot\nabla\lambda_3\right)+\lambda_3^2|\nabla\lambda_2|^2\\
+	&=\frac{|K|}{6}\left(|\nabla\lambda_3|^2-\nabla\lambda_2\cdot\nabla\lambda_3+|\nabla\lambda_2|^2\right)=\frac{1}{24|K|}(v_3^2-v_2\cdot v_3+v_2^2)\\
+	&=\frac{1}{24|K|}[(y_1-y_2)^2-(y_1-y_2)(y_3-y_1)+(y_3-y_1)^2+(x_2-x_1)^2-(x_2-x_1)(x_1-x_3)+(x_1-x_3)^2]
+	\end{align*}}
+{\small \begin{align*}
+	\int_{\triangle}\phi_{31}^2	&=\int_{\triangle} (\lambda_3\nabla\lambda_1-\lambda_1\nabla\lambda_3)^2
+	=\int_{\triangle}\lambda_3^2|\nabla\lambda_1|^2-2\lambda_3\lambda_1\left(\nabla\lambda_3\cdot\nabla\lambda_1\right)+\lambda_1^2|\nabla\lambda_3|^2\\
+	&=\frac{|K|}{6}\left(|\nabla\lambda_3|^2-\nabla\lambda_3\cdot\nabla\lambda_1+|\nabla\lambda_1|^2\right)=\frac{1}{24|K|}(v_3^2-v_3\cdot v_1+v_1^2)\\
+	&=\frac{1}{24|K|}[(y_1-y_2)^2-(y_1-y_2)(y_2-y_3)+(y_2-y_3)^2+(x_2-x_1)^2-(x_2-x_1)(x_3-x_2)+(x_3-x_2)^2]
+	\end{align*}}
+Hence:
+\[
+\int_{\triangle}\phi_{ij}^2=\frac{1}{24|K|}(v_i^2+v_j^2-v_i\cdot v_j)
+\]
+Upper entries:
+\begin{align*}
+	\int_{\triangle}\phi_{12}\phi_{23}	&=\int_{\triangle} (\lambda_1\nabla\lambda_2-\lambda_2\nabla\lambda_1)(\lambda_2\nabla\lambda_3-\lambda_3\nabla\lambda_2)\\
+	&=\int_{\triangle}\lambda_1\lambda_2\nabla\lambda_2\cdot\nabla\lambda_3-\lambda_1\lambda_3|\nabla\lambda_2|^2-\lambda_2^2\nabla\lambda_1\cdot\nabla\lambda_3+\lambda_2\lambda_3\nabla\lambda_1\cdot\nabla\lambda_2\\
+	&=\frac{|K|}{12}(\nabla\lambda_2\cdot\nabla\lambda_3-|\nabla\lambda_2|^2-2\nabla\lambda_1\cdot\nabla\lambda_3+\nabla\lambda_1\cdot\nabla\lambda_2)\\
+	&=\frac{1}{48|K|}(v_2\cdot v_3-v_2^2-2v_1\cdot v_3+v_1\cdot v_2)
+\end{align*}
+\begin{align*}
+	\int_{\triangle}\phi_{12}\phi_{31}	&=\int_{\triangle} (\lambda_1\nabla\lambda_2-\lambda_2\nabla\lambda_1)(\lambda_3\nabla\lambda_1-\lambda_1\nabla\lambda_3)\\
+	&=\int_{\triangle}\lambda_1\lambda_3\nabla\lambda_1\cdot\nabla\lambda_2-\lambda_1^2\nabla\lambda_2\cdot\nabla\lambda_3-\lambda_2\lambda_3|\nabla\lambda_1|^2+\lambda_1\lambda_2\nabla\lambda_1\cdot\nabla\lambda_3\\
+	&=\frac{|K|}{12}(\nabla\lambda_1\cdot\nabla\lambda_2-2\nabla\lambda_2\cdot\nabla\lambda_3-|\nabla\lambda_1|^2+\nabla\lambda_1\cdot\nabla\lambda_3)\\
+	&=\frac{1}{48|K|}(v_1\cdot v_2-2v_2\cdot v_3-v_1^2+v_1\cdot v_3)
+\end{align*}
+\begin{align*}
+	\int_{\triangle}\phi_{23}\phi_{31}	&=\int_{\triangle} (\lambda_2\nabla\lambda_3-\lambda_3\nabla\lambda_2)(\lambda_3\nabla\lambda_1-\lambda_1\nabla\lambda_3)\\
+	&=\int_{\triangle}\lambda_2\lambda_3\nabla\lambda_1\cdot\nabla\lambda_3-\lambda_3^2\nabla\lambda_1\cdot\nabla\lambda_2-\lambda_1\lambda_2|\nabla\lambda_3|^2+\lambda_1\lambda_3\nabla\lambda_2\cdot\nabla\lambda_3\\
+	&=\frac{|K|}{12}(\nabla\lambda_1\cdot\nabla\lambda_3-2\nabla\lambda_1\cdot\nabla\lambda_2-|\nabla\lambda_3|^2+\nabla\lambda_2\cdot\nabla\lambda_3)\\
+	&=\frac{1}{48|K|}(v_1\cdot v_3-2v_1\cdot v_2-v_3^2+v_2\cdot v_3)
+\end{align*}
+Hence:
+\[
+\int_{\triangle}\phi_{ij}\phi_{jk}=\frac{1}{48|K|}(v_i\cdot v_j+v_j\cdot v_k-v_j^2-2v_i\cdot v_k)
+\]
+For stiffness matrix:
+\[
+\nabla\times \phi_{ij} = 2\nabla\lambda_i\times \nabla\lambda_j
+\]
+Hence
+\[
+\int_{\triangle}\nabla\times \phi_{ij} = 2|K|\nabla\lambda_i\times \nabla\lambda_j=\frac{1}{2|K|}v_i\times v_j
+\]
+\begin{remark}
+	For 2-D vector $ \alpha=(a,b) $ and $ \beta=(c,d) $, the curl is a scalar (actually a 3-D vector along the orthogonal direction), given by
+	\[
+	\alpha\times \beta = 
+	\begin{vmatrix}
+	a	&	b\\
+	c	&	d
+	\end{vmatrix}
+	\]
+\end{remark}
+In the program, the local mass matrix $ matM $ is defined by
+\[
+matM=
+\begin{bmatrix}
+\frac{1}{24}	&	\frac{1}{48}	&	\frac{1}{48}\\
+\frac{1}{48}	&	\frac{1}{24}	&	\frac{1}{48}\\
+\frac{1}{48}	&	\frac{1}{48}	&	\frac{1}{24}
+\end{bmatrix}
+\]
+and stiffness matrix $ matBM $
+\[
+matBM=
+\begin{bmatrix}
+\frac{1}{2}\\
+\frac{1}{2}\\
+\frac{1}{2}
+\end{bmatrix}
+\]
+
+
+\end{document} 
